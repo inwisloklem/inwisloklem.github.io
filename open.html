@@ -1,0 +1,47 @@
+<script>
+(function() {
+  if (!window.document || !window.navigator) {
+    return
+  }
+
+  var isAndroid = function() {
+    return navigator.userAgent.match('Android')
+  }
+
+  var isIOS = function() {
+    return navigator.userAgent.match('iPad') || navigator.userAgent.match('iPhone') || navigator.userAgent.match('iPod')
+  }
+
+  var isMobile = function() {
+    return isAndroid() || isIOS()
+  }
+
+  function tryOpen(uri) {
+    if (!isMobile()) {
+      return false
+    }
+
+    if (isAndroid() && !navigator.userAgent.match(/Firefox/)) {
+      var matches = uri.match(/([^:]+):\/\/(.+)$/i)
+      uri = 'intent://' + matches[2] + '#Intent;scheme=' + matches[1]
+      uri += ';package=ru.butik.android;end';
+    }
+
+    var iframe = document.createElement('iframe')
+    iframe.onload = function() {
+      iframe.parentNode.removeChild(iframe)
+      window.location.href = uri
+    }
+
+    iframe.src = uri
+    iframe.setAttribute('style', 'display:none;')
+    document.body.appendChild(iframe)
+
+    return true
+  }
+
+  var isInstalled = tryOpen('butik://screen?name=brands')
+  alert('Is installed: ' + isInstalled)
+})()
+</script>
+
